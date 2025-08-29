@@ -1,0 +1,38 @@
+[
+    {
+        "id": 1,
+        "name": "Igabe Niyodusenga Nadine",
+        "age": 18,
+        "class": "l5",
+        "attendance": [
+            "Present"
+        ],
+        "payments": [
+            92500
+        ]
+    },
+    {
+        "id": 2,
+        "name": "Ineza Orga",
+        "age": 18,
+        "class": "l5",
+        "attendance": [
+            "Excused"
+        ],
+        "payments": [
+            92500
+        ]
+    },
+    {
+        "id": 3,
+        "name": "Igabe Nadia",
+        "age": 20,
+        "class": "l5",
+        "attendance": [
+            "Permission"
+        ],
+        "payments": [
+            92500
+        ]
+    }
+]
