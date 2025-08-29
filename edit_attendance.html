@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Attendance - School System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #6f42c1;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-bg: #f8f9fc;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7ff 0%, #e9ecef 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .attendance-card {
+            border-radius: 15px;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+            border: none;
+            margin-top: 2rem;
+            background: white;
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 15px 15px 0 0 !important;
+            padding: 1.5rem;
+        }
+        
+        .student-info {
+            background-color: var(--light-bg);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .status-select {
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .status-select:focus {
+            border-left: 4px solid var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+        }
+        
+        .btn-outline-secondary {
+            border-radius: 8px;
+            padding: 0.5rem 1.5rem;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .status-Present { background-color: var(--success-color); }
+        .status-Absent { background-color: var(--danger-color); }
+        .status-Late { background-color: var(--warning-color); }
+        .status-Excused { background-color: var(--info-color); }
+        
+        .attendance-history {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .history-item {
+            border-left: 3px solid var(--primary-color);
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.5rem;
+            background-color: var(--light-bg);
+            border-radius: 0 5px 5px 0;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: #5a5c69;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="attendance-card">
+                    <div class="card-header">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h3 class="mb-0"><i class="bi bi-calendar-check me-2"></i>Edit Attendance</h3>
+                            <a href="{{ url_for('attendance') }}" class="btn btn-sm btn-light">
+                                <i class="bi bi-arrow-left me-1"></i> Back to Attendance
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <!-- Student Information -->
+                        <div class="student-info">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <h5 class="mb-1">{{ student.name }}</h5>
+                                    <p class="mb-0 text-muted">Student ID: #{{ student.id }} | Class: {{ student.class }} | Age: {{ student.age }}</p>
+                                </div>
+                                <div class="col-md-4 text-md-end">
+                                    <span class="badge bg-primary">Record #{{ index + 1 }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Current Status -->
+                        <div class="current-status mb-4">
+                            <h6 class="form-label">Current Status:</h6>
+                            <div class="d-inline-block px-3 py-2 rounded bg-light">
+                                <span class="status-indicator status-{{ current_status }}"></span>
+                                <strong>{{ current_status }}</strong>
+                            </div>
+                        </div>
+                        
+                        <!-- Edit Form -->
+                        <form method="POST">
+                            <div class="mb-4">
+                                <label class="form-label">Select New Status:</label>
+                                <select name="status" class="form-select status-select py-2">
+                                    <option value="Present" {% if current_status == 'Present' %}selected{% endif %}>
+                                        Present
+                                    </option>
+                                    <option value="Absent" {% if current_status == 'Absent' %}selected{% endif %}>
+                                        Absent
+                                    </option>
+                                    <option value="Late" {% if current_status == 'Late' %}selected{% endif %}>
+                                        Late
+                                    </option>
+                                    <option value="Excused" {% if current_status == 'Excused' %}selected{% endif %}>
+                                        Excused
+                                    </option>
+                                </select>
+                                <div class="form-text mt-2">
+                                    <i class="bi bi-info-circle me-1"></i> Update the attendance status for this student record.
+                                </div>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                <a href="{{ url_for('attendance') }}" class="btn btn-outline-secondary me-md-2">
+                                    <i class="bi bi-x-circle me-1"></i> Cancel
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-check2-circle me-1"></i> Update Attendance
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <!-- Attendance History -->
+                        <div class="mt-5">
+                            <h5 class="mb-3"><i class="bi bi-clock-history me-2"></i>Attendance History</h5>
+                            <div class="attendance-history">
+                                {% if student.attendance %}
+                                    {% for record in student.attendance %}
+                                        <div class="history-item">
+                                            <div class="d-flex justify-content-between">
+                                                <span>
+                                                    <span class="status-indicator status-{{ record }}"></span>
+                                                    {{ record }}
+                                                </span>
+                                                <small class="text-muted">Record #{{ loop.index }}</small>
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center py-3 text-muted">
+                                        <i class="bi bi-inbox display-4 d-block mb-2"></i>
+                                        No attendance records found
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4 text-muted">
+                    <small>School Management System © 2025</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
